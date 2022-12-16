@@ -327,7 +327,7 @@ async function getCandleData() {
         }
     }    
 }
-getCandleData();
+//getCandleData();
 
 // class CandleData {
 //     constructor(time, open, high, low, close) {
