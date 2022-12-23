@@ -180,6 +180,10 @@ async function getCandleData() {
     //log(UNIXtimestamp);
     var oneMinuteLater = Math.floor((new Date()).getTime()/1000+60);
     //log(oneMinuteLater);
+    // var blockRangeStart = blockNoByTimestamp;
+    // log(blockRangeStart);
+    // var blockRangeEnd = blockNoByTimestamp + 20;
+    // log(blockRangeEnd);
 
     const iterateOverTime = async() => {
         for (let i = 0; i == i; i++) {                         
@@ -195,6 +199,8 @@ async function getCandleData() {
             log(UNIXtimestamp);
             oneMinuteLater = Math.floor((new Date()).getTime()/1000+60);
             log(oneMinuteLater);
+            // blockRangeEnd = await blockNoByTimestamp;
+            // log(blockRangeEnd);
         } continue;
         }
     }
@@ -224,6 +230,30 @@ async function getCandleData() {
         //log(fetchedBNBPrice);
         return fetchedBNBPrice;
         })
+
+        // let blockNoByTimestamp = fetch(`https://api.bscscan.com/api?module=block&action=getblocknobytime&timestamp=${currentTime}&closest=before&apikey=${BSCSCAN_API_KEY}`)
+        //     .then(res => res.json())
+        //     .then(data => {
+        // const currentBlock = parseFloat(data.result);
+        // return currentBlock;
+        // })
+
+        // let tokenTransferEvents = fetch(`https://api.bscscan.com/api
+        // ?module=account
+        // &action=tokentx
+        // &contractaddress=${PAIR_CONTRACT_ADDRESS}
+        // &address=${RESERVE_CONTRACT_ADDRESS}
+        // &page=1
+        // &offset=5
+        // &startblock=${blockRangeStart}
+        // &endblock=${blockRangeEnd}
+        // &sort=asc
+        // &apikey=${BSCSCAN_API_KEY}`)
+        //     .then(res => res.json())
+        //     .then(data => {
+        // const BEP20TransferEvents = parseFloat(data.result.value);
+        // return BEP20TransferEvents;
+        // })
 
         let price = (await token0ReserveBalance / (await token1TotalSupply * 0.1));
         let marketCap = (await price) * (await token1TotalSupply);
@@ -283,6 +313,7 @@ async function getCandleData() {
             close = price;
             prevClose = newClose;
             prevUNIXtimestamp = UNIXtimestamp;
+            // blockRangeStart = blockRangeEnd;
         }
          
         var array1 = [];
@@ -291,6 +322,8 @@ async function getCandleData() {
         array1[2] = toSigned(high)
         array1[3] = toSigned(low)
         array1[4] = toSigned(close)
+        // array1[5] = blockNoByTimestamp
+        // array1[6] = toSigned(tokenTransferEvents)
         //log(array1)
 
         candleStore.push([UNIXtimestamp, toSigned(open), toSigned(high), toSigned(low), toSigned(close)]);
@@ -308,6 +341,11 @@ async function getCandleData() {
             time: array1[0],
             value: toSigned((parseFloat(array1[4]) + parseFloat(array1[1])) / 2),
         };
+
+        // var volumeData = {
+        //     time: array1[0],
+        //     value: array1[6]
+        // }
         
         areaSeries.update(lineData);
         candleSeries.update(candleData);
