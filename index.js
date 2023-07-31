@@ -6,10 +6,10 @@
 
 //Code
 
-const BSCSCAN_API_KEY = "KWYUM5QEJMJ58KM24FMQX41PFIXUAMGY6Q";
-const PAIR_CONTRACT_ADDRESS = "0x6F36bf5F090A810E17866784Dc0465aE60B50377";
-const TOKEN_CONTRACT_ADDRESS = "0x3252eE91684343150E39056447F125c3605b140F";
-const RESERVE_CONTRACT_ADDRESS = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c";
+const API_KEY = "DFGDZIPFJ6Z8ZWSN4QAMIYIVHF1Y1QN8K1";
+const PAIR_CONTRACT_ADDRESS = "0xf349a9f98c5405F5854d664Dd5fC7c89BE0F9D01";
+const TOKEN_CONTRACT_ADDRESS = "0xf454377e595a3AB0eEF41c5b6f0473de1161CcD8";
+const RESERVE_CONTRACT_ADDRESS = "0xcB2e6325DeAc7CD59ccE10fF90bfbe227d6D20Fc";
 
 const log = console.log;
 
@@ -33,6 +33,7 @@ const chartProperties = {
 const domElement = document.getElementById('tvchart');
 const mCap = document.getElementById('marketcap');
 const resBal = document.getElementById('reservebalance');
+const priceImpact = document.getElementById('priceimpact');
 const chart = LightweightCharts.createChart(domElement,chartProperties);
 
 // function generateCandlestickData() {
@@ -68,8 +69,8 @@ const lineData = candleStickData.map(datapoint => ({
 const areaSeries = chart.addAreaSeries({
     priceFormat: {
         type: 'price',
-        minMove: 0.0000000001,
-        precision: 10,
+        minMove: 0.0000000000001,
+        precision: 13,
     },
     lastValueVisible: false, // hide the last value marker for this series
     crosshairMarkerVisible: false, // hide the crosshair marker for this series
@@ -83,8 +84,8 @@ const areaSeries = chart.addAreaSeries({
 const candleSeries = chart.addCandlestickSeries({
     priceFormat: {
         type: 'price',
-        minMove: 0.0000000001,
-        precision: 10,
+        minMove: 0.0000000000001,
+        precision: 13,
     },
 });
 
@@ -163,15 +164,19 @@ const timer = ms => new Promise(res => setTimeout(res, ms))
     
 // }
 // currentTime();
+var iterate = true;
+
+function iterateLoop(bool) {
+    iterate = bool;
+}
 
 async function getCandleData() {
-    var counter = 10000;
+    //var counter = 10000;
     var prevPrice;
     var prevHigh;
     var prevLow;
     var prevClose;
-    var newClose;
-    
+
     var currentTime = Math.floor(Date.now() / 1000);
     //var startTime = Math.floor((new Date()).getTime()/1000);
     var prevUNIXtimestamp = Math.floor(Date.now() / 1000);
@@ -186,52 +191,54 @@ async function getCandleData() {
     // log(blockRangeEnd);
 
     const iterateOverTime = async() => {
-        for (let i = 0; i == i; i++) {                         
-        while (currentTime < oneMinuteLater) {
-            await timer(1000);
-            currentTime = Math.floor(Date.now() / 1000);
-            log(currentTime);
-            continue;
-        } if (currentTime == oneMinuteLater) {
-            currentTime = Math.floor(Date.now() / 1000);
-            log(currentTime);
-            UNIXtimestamp = Math.floor(Date.now() / 1000);
-            log(UNIXtimestamp);
-            oneMinuteLater = Math.floor((new Date()).getTime()/1000+60);
-            log(oneMinuteLater);
-            // blockRangeEnd = await blockNoByTimestamp;
-            // log(blockRangeEnd);
-        } continue;
+        for (let i = 0; iterate == true; i++) {
+            while (currentTime < oneMinuteLater) {
+                await timer(1000); // 1000 ms = 1s
+                currentTime = Math.floor(Date.now() / 1000);
+                log(currentTime);
+                continue;
+            } if (currentTime == oneMinuteLater) {
+                currentTime = Math.floor(Date.now() / 1000);
+                log(currentTime);
+                UNIXtimestamp = Math.floor(Date.now() / 1000);
+                log(UNIXtimestamp);
+                oneMinuteLater = Math.floor((new Date()).getTime()/1000+60);
+                log(oneMinuteLater);
+                // blockRangeEnd = await blockNoByTimestamp;
+                // log(blockRangeEnd);
+            } continue;
         }
     }
     iterateOverTime();
 
-    for (let i = 0; i < counter; i++) {
-        await timer(10000);
+    for (let i = 0; iterate == true; i++) {
+        await timer(10000); // 10000ms = 10s
         // wait for the promise to resolve before advancing the for loop
-        let token1TotalSupply = fetch(`http://127.0.0.1:9665/fetchAPI?endpoint=https://api.bscscan.com/api?module=stats&action=tokensupply&contractaddress=${TOKEN_CONTRACT_ADDRESS}&apikey=${BSCSCAN_API_KEY}`)
+        // https://api-sepolia.etherscan.io/api?module=stats&action=tokensupply&contractaddress=${TOKEN_CONTRACT_ADDRESS}&apikey=${API_KEY}
+        let token1ReserveBalance = fetch(`http://127.0.0.1:9665/fetchAPI?endpoint=https://api-sepolia.etherscan.io/api?module=account&action=tokenbalance&contractaddress=${TOKEN_CONTRACT_ADDRESS}&address=${PAIR_CONTRACT_ADDRESS}&tag=latest&apikey=${API_KEY}`)
             .then(res => res.json())
             .then(data => {
         const dataLogSupply = data.result;
         return dataLogSupply;
         })
-    
-        let token0ReserveBalance = fetch(`http://127.0.0.1:9665/fetchAPI?endpoint=https://api.bscscan.com/api?module=account&action=tokenbalance&contractaddress=${RESERVE_CONTRACT_ADDRESS}&address=${PAIR_CONTRACT_ADDRESS}&tag=latest&apikey=${BSCSCAN_API_KEY}`)
+        // https://api-sepolia.etherscan.io/api?module=account&action=tokenbalance&contractaddress=${RESERVE_CONTRACT_ADDRESS}&address=${PAIR_CONTRACT_ADDRESS}&tag=latest&apikey=${API_KEY}
+        let token0ReserveBalance = fetch(`http://127.0.0.1:9665/fetchAPI?endpoint=https://api-sepolia.etherscan.io/api?module=account&action=tokenbalance&contractaddress=${RESERVE_CONTRACT_ADDRESS}&address=${PAIR_CONTRACT_ADDRESS}&tag=latest&apikey=${API_KEY}`)
             .then(res => res.json())
             .then(data => {
         const dataLogBalance = data.result;
         return dataLogBalance;
         })
 
-        let currentBNBPrice = fetch(`https://api.bscscan.com/api?module=stats&action=bnbprice&apikey=${BSCSCAN_API_KEY}`)
+        // https://api-sepolia.etherscan.io/api?module=stats&action=ethprice&apikey=YourApiKeyToken
+        let currentETHPrice = fetch(`https://api-sepolia.etherscan.io/api?module=stats&action=ethprice&apikey=${API_KEY}`)
             .then(res => res.json())
             .then(data => {
-        const fetchedBNBPrice = parseFloat(data.result.ethusd);
-        //log(fetchedBNBPrice);
-        return fetchedBNBPrice;
+        const fetchedETHPrice = parseFloat(data.result.ethusd);
+        //log(fetchedETHPrice);
+        return fetchedETHPrice;
         })
 
-        // let blockNoByTimestamp = fetch(`https://api.bscscan.com/api?module=block&action=getblocknobytime&timestamp=${currentTime}&closest=before&apikey=${BSCSCAN_API_KEY}`)
+        // let blockNoByTimestamp = fetch(`https://api.bscscan.com/api?module=block&action=getblocknobytime&timestamp=${currentTime}&closest=before&apikey=${API_KEY}`)
         //     .then(res => res.json())
         //     .then(data => {
         // const currentBlock = parseFloat(data.result);
@@ -248,15 +255,15 @@ async function getCandleData() {
         // &startblock=${blockRangeStart}
         // &endblock=${blockRangeEnd}
         // &sort=asc
-        // &apikey=${BSCSCAN_API_KEY}`)
+        // &apikey=${API_KEY}`)
         //     .then(res => res.json())
         //     .then(data => {
         // const BEP20TransferEvents = parseFloat(data.result.value);
         // return BEP20TransferEvents;
         // })
 
-        let price = (await token0ReserveBalance / (await token1TotalSupply * 0.1));
-        let marketCap = (await price) * (await token1TotalSupply);
+        let price = (await token0ReserveBalance / await token1ReserveBalance);
+        let marketCap = (await price) * (await token1ReserveBalance);
 
         if (price == prevPrice) {
             continue;
@@ -276,8 +283,7 @@ async function getCandleData() {
             close = price;
             prevHigh = price;
             prevLow = price;
-            prevClose = price;
-            
+            prevClose = price;           
         } else if (UNIXtimestamp == prevUNIXtimestamp) {
             open = prevClose;
             if (price > prevHigh) {
@@ -285,33 +291,33 @@ async function getCandleData() {
                 prevHigh = price;
             } else {
                 high = prevHigh;
-            }        
+            }
             if (price < prevLow) {
                 low = price;
                 prevLow = price;
             } else {
                 low = prevLow;
             }
-            newClose = price;
+            prevClose = price;
             close = price;
         } else if (UNIXtimestamp > prevUNIXtimestamp) {
-            open = newClose;
-            if (price > newClose) {
+            open = prevClose;
+            if (price > prevClose) {
                 high = price;
                 prevHigh = price;
             } else {
-                high = newClose;
-                prevHigh = newClose;
+                high = prevClose;
+                prevHigh = prevClose;
             }
-            if (price < newClose) {
+            if (price < prevClose) {
                 low = price;
                 prevLow = price;
             } else {
-                low = newClose;
-                prevLow = newClose;
+                low = prevClose;
+                prevLow = prevClose;
             }
             close = price;
-            prevClose = newClose;
+            prevClose = price;
             prevUNIXtimestamp = UNIXtimestamp;
             // blockRangeStart = blockRangeEnd;
         }
@@ -353,17 +359,19 @@ async function getCandleData() {
         log(lineData);
         prevPrice = price;
         
-        var updateReserveBalance    = RESERVE_CONTRACT_ADDRESS == 0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c 
-                                    ? toSigned(await token0ReserveBalance * await currentBNBPrice / 1000000000000000000) 
+        var updateReserveBalance    = RESERVE_CONTRACT_ADDRESS == 0xcB2e6325DeAc7CD59ccE10fF90bfbe227d6D20Fc 
+                                    ? toSigned(await token0ReserveBalance * await currentETHPrice / 1000000000000000000) 
                                     : toSigned(await token0ReserveBalance / 1000000000000000000);
-        var updateMarketCap         = RESERVE_CONTRACT_ADDRESS == 0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c 
-                                    ? toSigned(marketCap * await currentBNBPrice / 1000000000000000000) 
+        var updateMarketCap         = RESERVE_CONTRACT_ADDRESS == 0xcB2e6325DeAc7CD59ccE10fF90bfbe227d6D20Fc 
+                                    ? toSigned(marketCap * await currentETHPrice / 1000000000000000000) 
                                     : toSigned(marketCap / 1000000000000000000);
+        var updatePriceImpact       = close > open ? toSigned(((close - open) / open) * 100) : toSigned(((open - close) / open) * 100);
 
         resBal.innerHTML = "Reserve Balance: " + "<br>" + "<span style='color: green;'>$</span>" + "<span style='color: green;'>" + updateReserveBalance.toFixed(2) + "</span>";
-        mCap.innerHTML = "Market Cap: " + "<br>" + "<span style='color: green; font-weight: bold;'>$</span>" + "<span style='color: green;'>" + updateMarketCap.toFixed(2) + "</span>";        
+        mCap.innerHTML = "Market Cap: " + "<br>" + "<span style='color: green;'>$</span>" + "<span style='color: green;'>" + updateMarketCap.toFixed(2) + "</span>";
+        priceImpact.innerHTML = "Price Impact: " + "<br>" + "<span style='color: green;'>" + updatePriceImpact.toFixed(2) + "</span>" + "<span style='color: green;'>%</span>";
         }
-    }    
+    }
 }
 //getCandleData();
 

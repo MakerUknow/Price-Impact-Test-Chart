@@ -41,3 +41,13 @@ h2 {
     font-size: larger;
     color: #fff
 }
+
+#priceimpact {
+    position: absolute;
+    top: 150px;
+    left: 50px;
+    font-family:'Rajdhani';
+    font-weight: bold;
+    font-size: larger;
+    color: #fff
+}
